@@ -5,7 +5,7 @@ public static void main(String args[]) {
     cmdReader reader = new cmdReader(args);
     System.out.println("Received valid arguments");
     System.out.println("Option: "+ reader.option);
-    System.out.print("# of inputs: ");
+    System.out.print("Number of inputs: ");
     System.out.println(reader.numOfMd);
   }
 }

@@ -21,7 +21,7 @@ If you need help, type in HELP
 5. If your input is valid, the program will return result as:
 	Received valid arguments
 	Option : plain
-	# of inputs: 1
+	Number of inputs: 1
 
 ***VALID OPTIONS***
 
