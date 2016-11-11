@@ -19,8 +19,11 @@ If you need help, type in HELP
 4. If your input is invalid, the program will stop and tell you the reason why your input is invalid.
 
 5. If your input is valid, the program will return result as:
+	
 	Received valid arguments
+	
 	Option : plain
+	
 	Number of inputs: 1
 
 ***VALID OPTIONS***
