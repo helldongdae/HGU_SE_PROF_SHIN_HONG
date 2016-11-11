@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class mdToHtml1{
+public class mdToHtml{
 public static void main(String args[]) {
     cmdReader reader = new cmdReader(args);
     System.out.println("Received valid arguments");
