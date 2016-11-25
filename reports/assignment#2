@@ -1,0 +1,27 @@
+Software Engineering Term Project #2 
+Team J   
+21000004    강민규    / 21100673    조선웅    / 21200401    송지웅    / 21400451    오승준    /21400772    최인회 
+We improved project from the last submitted code by changing the code into visitor pattern. We implemented parser 
+and plain html code writer. Parser is implemented in the htmlWriter class. We use a function named startParse() to get 
+a character from the code. After parsing, the code checks if there is a header by checking if there exist special tokens 
+such as “#” or “*” in the sequence. Until now, we only implemented h1 to h6 header conversion and paragraph. The 
+pure HTML generator first makes the html file in given input, and when closing, they also writes predefined values. 
+After constructing code for generating plain HTML code, we used Jtidy library to check if there are any errors in the 
+generated HTML file. Our  code gives output  in the form of output.html In the java path, to  test output.html, we 
+implemented Jtidy such as:   
+1.   We putted jtidy.jar in the java path. 
+2.   Java -jar jtidy.jar output.html 
+Then, the jtidy library tells us where we have missed, like this:   
+ 
+From now, we will implement emphasis (*String*), (**String**), (~~String~~), list, link, table, blockquote, and other 
+headers and line break.   
+[ANT Apach] 
+Default  target  is  “compile”.  Before  compile  is 
+executed,  “clean”,  “create”  and  “copy”  are  all 
+executed in order. “Clean” erases all the originally 
+existing files in the directory, “create” creates a new 
+directory, and “copy” copies resources from target 
+directory.  Then  compile  target  is  executed  java 
+sources. 
+In  the example  to  the  left,  docs is where the 
+new HTML files will be added. 
