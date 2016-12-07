@@ -1,0 +1,14 @@
+<h1> H1</h1>
+<h2> H2</h2>
+<h3> H3</h3>
+<h4> H4</h4>
+<h5> H5</h5>
+<h6> H6</h6>
+
+<img src= "http://www.google.png " alt =" google.img ">
+
+ 
+<img src= " https//github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png " alt =" Logo Title Text2">
+
+
+Strikethrough uses two tildes. ~~Scratch this.~~
