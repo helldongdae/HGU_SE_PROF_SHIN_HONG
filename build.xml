@@ -1,40 +1,81 @@
-<project name = "Markdown_SE_TermProject" default = "compile" basedir = ".">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name = "Markdown_SE_TermProject" default = "compile" basedir = "." xmlns:jacoco="antlib:org.jacoco.ant">
 
    <description>
-      markdown build project   
+      Markdown Project Builder   
    </description>
+   
+   <!-- import Jacoco Ant task -->
+   <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+   		<classpath path="${lib}/jacocoant.jar"/>
+   </taskdef>
+
    <property name="src" location="src"/>
-   <property name="lib" location="lib"/>
+   <property name="lib" location="libs"/>
    <property name="bin" location="bin"/>
-   <property name="doc" location="doc"/>
+   <property name="doc" location="docs"/>
    <property name="build" location="build"/>
+   <property name="srcTest" location="src/test"/>
+   <property name="test" location="test"/>	
+	
    <!--delete exist directories to initiate the workspace-->
-   <target name="clean">
-      <delete dir = "${bin}"></delete>
-      <delete dir = "${src}"></delete>
-      <delete dir = "${lib}"></delete>
-      <delete dir = "${doc}"></delete>
-      <delete dir = "${build}"></delete>
+   <target name="clean" description ="Clean directories">
+      <delete dir = "${doc}"/>
+      <delete dir = "${build}"/>
+      <delete dir = "${test}"/>
+      <delete dir = "${srcTest}"/>
+      <delete file ="jacoco.exec"/>
    </target>
    
    <!--make directories for a new compilation-->
    <target name="create" depends = "clean">
-      <mkdir dir="${bin}"/>
-      <mkdir dir="${src}"/>
-      <mkdir dir="${lib}"/>
       <mkdir dir="${doc}"/>
       <mkdir dir="${build}"/>
+      <mkdir dir="${test}"/>
+      <mkdir dir="${srcTest}"/>
    </target>
-      
+ 
    <!--compile java sources-->
    <target name="compile" depends = "create">
-      <javac includeantruntime= "true" srcdir= "${src}" destdir= "${build}" includes="**/*.jar"></javac>
+      <javac srcdir= "${src}" destdir= "${build}" includeantruntime= "false" debug ="true">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>      
+      </javac>
+      <javac srcdir= "${srcTest}" destdir= "${test}" includeantruntime= "false" debug ="true">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath> 
+      </javac>
    </target>
+   
+   
+   
+   <target name = "test" depends = "compile">
+   
+   
+   </target>
+   
+
+
+   <target name = "report" depends = "test">
+   
+   
+   </target>
+   
+   
+   
+   
+   
 
    <!--generate HTML Doc-->
    <target name="generateDoc" depends = "compile">
       <javadoc scrdir= "${src}" destdir= "${doc}"/>
-   </target>
-
-   
+      <javadoc scrdir= "${srcTest}" destdir= "${doc}"/>
+   </target>   
 </project>
