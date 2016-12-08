@@ -6,34 +6,41 @@
       Markdown Project Builder   
    </description>
    
-   <!-- import Jacoco Ant task -->
-   <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-   		<classpath path="${lib}/jacocoant.jar"/>
-   </taskdef>
+
 
    <property name="src" location="src"/>
    <property name="lib" location="lib"/>
-   <property name="bin" location="bin"/>
    <property name="doc" location="doc"/>
    <property name="build" location="build"/>
    <property name="srcTest" location="src/test"/>
-   <property name="test" location="test"/>	
+   <property name="test" location="test"/>
+   <property name="report" location="report"/>
+	
+	<!-- import Jacoco Ant task -->
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="../../../lib/jacocoant.jar" />
+	</taskdef>
+	
 	
    <!--delete exist directories to initiate the workspace-->
    <target name="clean" description ="Clean directories">
-      <delete dir = "${doc}"/>
-      <delete dir = "${build}"/>
-      <delete dir = "${test}"/>
-      <delete dir = "${srcTest}"/>
-      <delete file ="jacoco.exec"/>
+    <delete dir = "${doc}"/>
+    <delete dir = "${build}"/>
+   	<delete dir = "${test}"/>
+   	<delete dir = "${srcTest}"/>
+    <delete dir = "${lib}"/>
+    <delete dir = "${report}"/>
+    <delete file ="jacoco.exec"/>
    </target>
    
    <!--make directories for a new compilation-->
    <target name="create" depends = "clean">
-      <mkdir dir="${doc}"/>
-      <mkdir dir="${build}"/>
-      <mkdir dir="${test}"/>
-      <mkdir dir="${srcTest}"/>
+   	<mkdir dir="${doc}"/>
+   	<mkdir dir="${build}"/>
+   	<mkdir dir="${test}"/>
+   	<mkdir dir="${srcTest}"/>
+   	<mkdir dir="${lib}"/>
+	<mkdir dir="${report}"/>
    </target>
  
    <!--compile java sources-->
@@ -56,26 +63,51 @@
    
    
    
-   <target name = "test" depends = "compile">
-   
-   
+   <target name = "junitTest" depends = "compile">
+    <junit haltonfailure="no" printsummary="on" showoutput="ture" enabletestlistenerevents="true" >
+		<!--
+			<classpath location="lib/junit-4.11.jar" />
+			<classpath location="lib/hamcrest-core-1.3.jar" />
+		--> 	
+    	<classpath path="${build}"/>
+        <classpath path="${test}"/>
+        <classpath path="${lib}/junit-4.12.jar"/>
+        <classpath path="${lib}/hamcrest-core-1.3.jar"/>    
+    	<formatter type="plain" usefile="false"/> 	
+		<formatter type="xml" />
+		
+    	<batchtest fork="yes">
+			<fileset dir="${test}">
+				<include name="**/*Test*.java"/>
+			</fileset>
+		</batchtest> 	
+     </junit>    
+   </target>
+
+
+   <target name = "report" depends = "junitTest">
+	<jacoco:report>
+
+		<!-- This task needs the collected execution data and ... -->
+		<executiondata>
+			<file file="jacoco.exec}" />
+		</executiondata>
+
+		<!-- the class files and optional source files ... -->
+		<structure name="JaCoCo Ant">
+			<classfiles>
+				<fileset dir="${build}" />
+			</classfiles>
+			<sourcefiles encoding="UTF-8">
+				<fileset dir="${src}" />
+			</sourcefiles>
+		</structure>
+
+		<!-- reports in diverse formats. -->
+		<html destdir="${report}" />
+		<csv destfile="${report}/report.csv" />
+		<xml destfile="${report}/report.xml" />
+	</jacoco:report>  
    </target>
    
-
-
-   <target name = "report" depends = "test">
-   
-   
-   </target>
-   
-   
-   
-   
-   
-
-   <!--generate HTML Doc-->
-   <target name="generateDoc" depends = "compile">
-      <javadoc scrdir= "${src}" destdir= "${doc}"/>
-      <javadoc scrdir= "${srcTest}" destdir= "${doc}"/>
-   </target>   
 </project>
