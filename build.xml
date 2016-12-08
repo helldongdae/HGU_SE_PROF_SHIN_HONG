@@ -87,7 +87,6 @@
 
    <target name = "report" depends = "junitTest">
 	<jacoco:report>
-
 		<!-- This task needs the collected execution data and ... -->
 		<executiondata>
 			<file file="jacoco.exec}" />
