@@ -1,0 +1,50 @@
+<project name = "Markdown_SE_TermProject" default = "compile" basedir = ".">
+
+   <description>
+      markdown build project   
+   </description>
+   <property name="src" location="src"/>
+   <property name="lib" location="libs"/>
+   <property name="bin" location="bin"/>
+   <property name="doc" location="docs"/>
+   <property name="build" location="build"/>
+   <!--delete exist directories to initiate the workspace-->
+   <target name="clean">
+      <delete dir = "${bin}"></delete>
+      <delete dir = "${src}"></delete>
+      <delete dir = "${lib}"></delete>
+      <delete dir = "${doc}"></delete>
+      <delete dir = "${build}"></delete>
+   </target>
+   
+   <!--make directories for a new compilation-->
+   <target name="create" depends = "clean">
+      <mkdir dir="${bin}"/>
+      <mkdir dir="${src}"/>
+      <mkdir dir="${lib}"/>
+      <mkdir dir="${doc}"/>
+      <mkdir dir="${build}"/>
+   </target>
+   
+	<!--copy .jar, sources, libraries, files from host to local -->
+	  <target name="load" depends = "create">
+	     <copydir src= "C:\Users\민규\eclipse\HGU_SE_PROF_SHIN_HONG\src" dest="${src}"></copydir>
+	      <copy todir= "${lib}" overwrite= "true">
+	         <fileset dir="" includes="**/*.jar"/>
+	      </copy>
+	   </target>
+	   
+	
+   <!--compile java sources-->
+   <target name="compile" depends = "create">
+      <javac includeantruntime= "true" srcdir= "${src}" destdir= "${build}" includes="**/*.jar"></javac>
+   </target>
+
+
+   <!--generate HTML Doc-->
+   <target name="generateDoc" depends = "compile">
+      <javadoc scrdir= "${src}" destdir= "${doc}"/>
+   </target>
+
+   
+</project>
