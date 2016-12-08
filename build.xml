@@ -12,9 +12,9 @@
    </taskdef>
 
    <property name="src" location="src"/>
-   <property name="lib" location="libs"/>
+   <property name="lib" location="lib"/>
    <property name="bin" location="bin"/>
-   <property name="doc" location="docs"/>
+   <property name="doc" location="doc"/>
    <property name="build" location="build"/>
    <property name="srcTest" location="src/test"/>
    <property name="test" location="test"/>	
