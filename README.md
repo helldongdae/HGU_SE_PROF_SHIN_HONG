@@ -23,3 +23,4 @@ All of the compiled class files are in class folder
 All of the test junit classes are in test folder
 
 You can edit build.xml file to give different instructions to ant
+CHANGE DIRECTORY NAME TO HGU_SE_PROF_SHIN_HONG
