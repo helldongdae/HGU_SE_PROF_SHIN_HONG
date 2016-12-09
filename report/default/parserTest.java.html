@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>parserTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mdToHtml</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">parserTest.java</span></div><h1>parserTest.java</h1><pre class="source lang-java linenums">import java.io.*;
+import java.util.*;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+<span class="fc" id="L6">class parser{</span>
+<span class="fc" id="L7">  String s = &quot;&quot;;</span>
+<span class="fc" id="L8">  int c = 0;</span>
+<span class="fc" id="L9">  boolean endOfFile = false;</span>
+
+  boolean isItEnd(){
+<span class="fc" id="L12">    return endOfFile;</span>
+  }
+
+  String parse(FileInputStream f){
+    try{
+      while(true){
+<span class="fc" id="L18">        c = f.read();</span>
+        // END CONDITION
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        if(c == -1){</span>
+<span class="fc" id="L21">          String rets = s;</span>
+<span class="fc" id="L22">          endOfFile = true;</span>
+<span class="fc" id="L23">          return rets;</span>
+        }
+        // EOF
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        else if((char)c == '\n'){</span>
+<span class="fc" id="L27">          String rets = s;</span>
+<span class="fc" id="L28">          s = &quot;&quot;;</span>
+<span class="fc" id="L29">          return rets;</span>
+        }
+<span class="fc" id="L31">        s += (char)c;</span>
+      }
+    }
+<span class="nc" id="L34">    catch(Exception e){</span>
+<span class="nc" id="L35">      return &quot;&quot;;  </span>
+    }
+  }
+}
+
+public class parserTest{
+   @Test
+   public void test(){
+      FileInputStream f = null;
+      try{
+         f = new FileInputStream(&quot;test.md&quot;);
+      }
+      catch(Exception e){
+
+      }
+      parser parse = new parser();
+      String s = parse.parse(f);
+      System.out.println(s);
+      assertEquals(s, &quot;* ul 1\n&quot;);
+   }
+
+   @Test
+   public void test2(){
+     boolean endOfFile = false;
+     parser parse = new parser();
+     boolean n = parse.isItEnd();
+     assertEquals(n,endOfFile);          
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

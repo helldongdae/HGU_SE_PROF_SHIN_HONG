@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>getcmdTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mdToHtml</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">getcmdTest.java</span></div><h1>getcmdTest.java</h1><pre class="source lang-java linenums">import java.io.*;
+import java.util.*;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+class getCmd{
+  String option;
+  String arguments[];
+
+  void getargs(String args[]){
+    arguments = args;
+  }
+
+  void help(){
+        System.out.println(&quot;-----------HELP-------------&quot;);
+        System.out.println(&quot;MarkDown -&gt; HTML Converter&quot;);
+        System.out.println(&quot;v. 1. 0.&quot;);
+        System.out.println(&quot;Valid Options&quot;);
+        System.out.println(&quot;1. plain   2. fancy   3. slide&quot;);
+        System.out.println(&quot;argument 1 = File name&quot;);
+        System.out.println(&quot;argument 2 = Option   &quot;);
+        System.out.println(&quot;________________________________&quot;);
+    }   
+
+    String getOption(){
+      return option;
+    }
+
+    boolean checkIfValid(String arguments[]){
+    // Check if given file is a valid md file
+        int locationOfDot = 0;
+        String checkValidMD = null;
+
+        if(arguments.length &gt; 2 || arguments.length == 0){
+            System.out.println(&quot;ERROR : Invalid command line arguments!&quot;);
+            return false;
+        }
+
+        if(arguments[0].equals(&quot;HELP&quot;)){
+          help();
+          return false;
+        }
+
+        locationOfDot = arguments[0].indexOf('.');
+        
+        if(locationOfDot == -1){
+            System.out.println(&quot;ERROR : Invalid fle name!&quot;);
+            return false;
+        }
+        
+        checkValidMD = arguments[0].substring(locationOfDot);    
+        
+        if(!checkValidMD.equals(&quot;.md&quot;)){
+            System.out.println(&quot;ERROR: Invalid fle name!&quot;);
+            return false;
+        }
+
+        if(arguments.length &gt; 1){
+          if(arguments[1].equals(&quot;plain&quot;)){
+            option = &quot;plain&quot;;
+            return true;
+          } 
+
+          if(arguments[1].equals(&quot;fancy&quot;)){
+            option = &quot;fancy&quot;;
+            return true;
+          }
+
+          if(arguments[1].equals(&quot;slide&quot;)){
+            option = &quot;slide&quot;;
+            return true;
+          }
+            
+        else{
+          System.out.println(&quot;ERROR: Invalid Option!&quot;);
+          return false;
+        }
+    }
+      else 
+           return true;
+    }
+
+    FileInputStream readFile(String fileName){
+        FileInputStream f = null;
+        try{
+            f = new FileInputStream(fileName);
+        }
+        catch(Exception e){
+            System.out.println(&quot;ERROR: File does not exist!&quot;);
+        }
+        return f;
+    }
+}
+
+<span class="fc" id="L95">public class getcmdTest</span>
+{ 
+<span class="fc" id="L97">    boolean fal = false; </span>
+<span class="fc" id="L98">     boolean tru = true ;</span>
+<span class="fc" id="L99">     String arguments[] = new String[2]; </span>
+   
+   @Test
+   public void checkIfValidTest1()
+   {
+      // testcase for help() argument[0]
+<span class="fc" id="L105">      arguments[0] = &quot;HELP&quot; ;</span>
+<span class="fc" id="L106">      getCmd getcmd = new getCmd();</span>
+<span class="fc" id="L107">      System.out.println(&quot;inside checkIfValidTest1()&quot;);</span>
+<span class="fc" id="L108">      boolean n = getcmd.checkIfValid(arguments);</span>
+<span class="fc" id="L109">      assertEquals(fal,n);</span>
+<span class="fc" id="L110">   }</span>
+   
+   @Test
+   public void checkIfValidTest2()
+   {
+      // testcase for argument[0] = filename check  Invalid filename 
+<span class="fc" id="L116">      arguments[0] = &quot;test.msd&quot; ; // shoud return false</span>
+<span class="fc" id="L117">      getCmd getcmd = new getCmd();</span>
+<span class="fc" id="L118">      System.out.println(&quot;inside checkIfValidTest2()&quot;);</span>
+<span class="fc" id="L119">      boolean n = getcmd.checkIfValid(arguments);</span>
+<span class="fc" id="L120">      assertEquals(fal,n);</span>
+<span class="fc" id="L121">   }</span>
+   @Test
+   public void checkIfValidTest3()
+   {
+      // testcase for argument[1] == plain 
+<span class="fc" id="L126">      String arguments[] = new String[2]; </span>
+<span class="fc" id="L127">      arguments[0] = &quot;test.md&quot; ;</span>
+<span class="fc" id="L128">      arguments[1] = &quot;slide&quot; ;</span>
+<span class="fc" id="L129">      getCmd getcmd = new getCmd();</span>
+<span class="fc" id="L130">      System.out.println(&quot;inside checkIfValidTest3()&quot;); // should return true </span>
+<span class="fc" id="L131">      boolean n = getcmd.checkIfValid(arguments);</span>
+<span class="fc" id="L132">      assertEquals(tru,n);</span>
+<span class="fc" id="L133">   }</span>
+   @Test
+   public void checkIfValidTest4()
+   {
+      // testcase for argument.legnth == 1 should return true
+<span class="fc" id="L138">      String arguments[] = new String[1]; // </span>
+<span class="fc" id="L139">      arguments[0] = &quot;test.md&quot; ;</span>
+<span class="fc" id="L140">      getCmd getcmd = new getCmd();</span>
+<span class="fc" id="L141">      System.out.println(&quot;inside checkIfValidTest4()&quot;); // should return true </span>
+<span class="fc" id="L142">      boolean n = getcmd.checkIfValid(arguments);</span>
+<span class="fc" id="L143">      assertEquals(tru,n);</span>
+<span class="fc" id="L144">   }</span>
+   @Test
+   public void checkIfValidTest5()
+   {
+      // testcase for argument[1] == invalid option
+<span class="fc" id="L149">      String arguments[] = new String[2]; </span>
+<span class="fc" id="L150">      arguments[0] = &quot;test.md&quot; ;</span>
+<span class="fc" id="L151">      arguments[1] = &quot;sddddie&quot; ;</span>
+<span class="fc" id="L152">      getCmd getcmd = new getCmd();</span>
+<span class="fc" id="L153">      System.out.println(&quot;inside checkIfValidTest3()&quot;); // should return false</span>
+<span class="fc" id="L154">      boolean n = getcmd.checkIfValid(arguments);</span>
+<span class="fc" id="L155">      assertEquals(fal,n);</span>
+<span class="fc" id="L156">   }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

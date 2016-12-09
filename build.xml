@@ -1,52 +1,188 @@
-<project name = "Markdown_SE_TermProject" default = "compile" basedir = ".">
+<?xml version="1.0"  encoding="UTF-8"?>
+<project name="SoftwareEngineeringTeamJ" xmlns:jacoco="antlib:org.jacoco.ant" basedir="\HGU_SE_PROF_SHIN_HONG">
+<property name="src" value="${basedir}/src" />
+<property name="class" value="${basedir}/class" />
+<property name="test" value="${basedir}/test" />
 
-   <description>
-      markdown build project   
-   </description>
-   <property name="src" location="src"/>
-   <property name="lib" location="libs"/>
-   <property name="bin" location="bin"/>
-   <property name="doc" location="docs"/>
-   <property name="build" location="build"/>
-   <!--delete exist directories to initiate the workspace-->
-   <target name="clean">
-      <delete dir = "${bin}"></delete>
-      <delete dir = "${src}"></delete>
-      <delete dir = "${lib}"></delete>
-      <delete dir = "${doc}"></delete>
-      <delete dir = "${build}"></delete>
-   </target>
-   
-   <!--make directories for a new compilation-->
-   <target name="create" depends = "clean">
-      <mkdir dir="${bin}"/>
-      <mkdir dir="${src}"/>
-      <mkdir dir="${lib}"/>
-      <mkdir dir="${doc}"/>
-      <mkdir dir="${build}"/>
-   </target>
-   
-	<!--copy .jar, sources, libraries, files from host to local -->
-	  <target name="load" depends = "create">
-	     <copydir src= "C:\Users\민규\eclipse\HGU_SE_PROF_SHIN_HONG\src" dest="${src}"></copydir>
-	      <copy todir= "${lib}" overwrite= "true">
-	         <fileset dir="" includes="**/*.jar"/>
-	      </copy>
-	   </target>
-	   
-	
-   <!--compile java sources-->
-   <target name="compile" depends = "create">
-      <javac includeantruntime= "true" srcdir= "${src}" destdir= "${build}" includes="**/*.jar"></javac>
-   </target>
+  <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+        <classpath path="${basedir}/lib/jacocoant.jar"/>
+   </taskdef>
 
+<jacoco:coverage>
+    <junit fork="true" forkmode="once">
+        <test name="tokenizerTest"/>
+        <classpath>
+            <pathelement location="${basedir}\test"/>
+        </classpath>
+    </junit>
+</jacoco:coverage>
 
+<jacoco:coverage>
+    <junit fork="true" forkmode="once">
+        <test name="getcmdTest"/>
+        <classpath>
+            <pathelement location="${basedir}\test"/>
+        </classpath>
+    </junit>
+</jacoco:coverage>
 
+<jacoco:coverage>
+    <junit fork="true" forkmode="once">
+        <test name="htmlHandlerTest"/>
+        <classpath>
+            <pathelement location="${basedir}\test"/>
+        </classpath>
+    </junit>
+</jacoco:coverage>
 
-   <!--generate HTML Doc-->
-   <target name="generateDoc" depends = "compile">
-      <javadoc scrdir= "${src}" destdir= "${doc}"/>
-   </target>
+<jacoco:coverage>
+    <junit fork="true" forkmode="once">
+        <test name="parserTest"/>
+        <classpath>
+            <pathelement location="${basedir}\test"/>
+        </classpath>
+    </junit>
+</jacoco:coverage>
 
-   
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.m"/>
+        <classpath>
+             <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "HELP"/>
+        <classpath>
+            <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+        <classpath>
+             <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "asd"/>
+        <classpath>
+             <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.md"/>
+    	<arg value = "plain"/>
+        <classpath>
+            <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.md"/>
+    	<arg value = "slide"/>
+        <classpath>
+          <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.md"/>
+    	<arg value = "fancy"/>
+        <classpath>
+         <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.md"/>
+    	<arg value = "qq"/>
+        <classpath>
+            <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.md"/>
+    	<arg value = "fancy"/>
+    	<arg value = "asd"/>
+        <classpath>
+            <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "texta.md"/>
+        <classpath>
+             <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "test.md"/>
+        <classpath>
+             <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "tes.md"/>
+        <classpath>
+             <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:coverage>
+    <java classname="vp" fork="true">
+    	<arg value = "text.md"/>
+        <classpath>
+            <pathelement location="${basedir}\class"/>
+        </classpath>
+    </java>
+</jacoco:coverage>
+
+<jacoco:report>
+                        
+    <executiondata>
+        <file file="jacoco.exec"/>
+    </executiondata>
+                        
+    <structure name="mdToHtml">
+        <classfiles>
+            <fileset dir="class"/>
+        </classfiles>
+        <sourcefiles encoding="UTF-8">
+            <fileset dir="src"/>
+        </sourcefiles>
+    </structure>
+                        
+    <html destdir="report"/>
+                        
+</jacoco:report>
+
 </project>

@@ -1,0 +1,787 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>vp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mdToHtml</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">vp.java</span></div><h1>vp.java</h1><pre class="source lang-java linenums">//package pack.song;
+
+import java.io.*;
+import java.util.*;
+
+interface Visitor{
+	public FileInputStream visit(getCmd getcmd);
+	public String visit(tokenizer tok);
+	public void visit(htmlHandler handler);
+	public String visit(parser parse);
+}
+
+interface Visitable{
+	public void accept(Visitor visitor);
+}
+
+<span class="fc" id="L17">class htmlHandler implements Visitable{</span>
+	FileWriter out;
+<span class="fc" id="L19">	String hasHeader = &quot;&quot;;</span>
+<span class="fc" id="L20">	boolean isOrderList = false;</span>
+<span class="fc" id="L21">	boolean isBlockQuote = false;</span>
+<span class="fc" id="L22">	boolean isParagraph = true;</span>
+<span class="fc" id="L23">	String fin = &quot;&quot;;</span>
+
+	void init(String outputname){
+		try{
+<span class="fc" id="L27">             out = new FileWriter(outputname);</span>
+<span class="fc" id="L28">             String s = &quot;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;+&quot;\&quot;utf-8\&quot;&gt;&lt;title&gt;Expected Output&lt;/title&gt;&lt;style&gt;&lt;/style&gt;&lt;/head&gt;&lt;body id=&quot;+&quot;\&quot;Preview\&quot;&gt;\n&lt;p&gt;\n&quot;;</span>
+<span class="fc" id="L29">             out.write(s);</span>
+        }
+<span class="nc" id="L31">        catch(Exception e){</span>
+<span class="nc" id="L32">            System.out.println(&quot;HTML OPEN ERROR&quot;);</span>
+<span class="fc" id="L33">        }</span>
+<span class="fc" id="L34">	}</span>
+
+	String writeHtml(int flag, String token, String sentence){
+		// Starts with something
+<span class="fc bfc" id="L38" title="All 2 branches covered.">		if(flag == 1){</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">			if(token.startsWith(&quot;h&quot;)){</span>
+<span class="fc" id="L40">				sentence = sentence.trim();</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">				if(isOrderList){</span>
+<span class="fc" id="L42">					endOfOrderList();</span>
+<span class="fc" id="L43">					isOrderList = false;</span>
+				}
+<span class="fc bfc" id="L45" title="All 2 branches covered.">				if(isBlockQuote){</span>
+<span class="fc" id="L46">					endOfBlockQuote();</span>
+<span class="fc" id="L47">					isBlockQuote = false;</span>
+				}
+<span class="fc" id="L49">				fin += (&quot;&lt;&quot; + token + &quot;&gt;&quot;);</span>
+<span class="fc" id="L50">				int n = Integer.parseInt(token.substring(1));</span>
+<span class="fc" id="L51">				hasHeader = token;</span>
+<span class="fc" id="L52">				return sentence.substring(n+1);</span>
+			}
+<span class="fc bfc" id="L54" title="All 2 branches covered.">			else if(token.equals(&quot;ul&quot;)){</span>
+<span class="fc" id="L55">				sentence = sentence.trim();</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">				if(isOrderList){</span>
+<span class="fc" id="L57">					endOfOrderList();</span>
+<span class="fc" id="L58">					isOrderList = false;</span>
+				}
+<span class="fc bfc" id="L60" title="All 2 branches covered.">				if(isBlockQuote){</span>
+<span class="fc" id="L61">					endOfBlockQuote();</span>
+<span class="fc" id="L62">					isBlockQuote = false;</span>
+				}
+				try{
+					//out.write(&quot;&lt;ul&gt;&lt;li&gt;&quot;);
+<span class="fc" id="L66">					hasHeader = &quot;ul&quot;;</span>
+<span class="fc" id="L67">					fin += (&quot;&lt;ul&gt;&lt;li&gt;&quot;);</span>
+<span class="fc" id="L68">					return sentence.substring(2);</span>
+				}
+<span class="nc" id="L70">				catch(Exception e){</span>
+
+<span class="nc" id="L72">				}</span>
+			}
+<span class="fc bfc" id="L74" title="All 2 branches covered.">			else if(token.equals(&quot;ol&quot;)){</span>
+<span class="fc" id="L75">				sentence = sentence.trim();</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">				if(isBlockQuote){</span>
+<span class="fc" id="L77">					endOfBlockQuote();</span>
+<span class="fc" id="L78">					isBlockQuote = false;</span>
+				}
+<span class="fc bfc" id="L80" title="All 2 branches covered.">				if(isOrderList){</span>
+					try{
+						//out.write(&quot;&lt;li&gt;&quot;);
+<span class="fc" id="L83">						hasHeader = &quot;ol&quot;;</span>
+<span class="fc" id="L84">						fin += &quot;&lt;li&gt;&quot;;</span>
+<span class="fc" id="L85">						return sentence.substring(sentence.indexOf(&quot;. &quot;) + 2);</span>
+					}
+<span class="nc" id="L87">					catch(Exception e){</span>
+
+<span class="nc" id="L89">					}</span>
+				}
+				else{
+<span class="fc" id="L92">					isOrderList = true;</span>
+					try{
+						//out.write(&quot;&lt;ol&gt;\n&lt;li&gt;&quot;);
+<span class="fc" id="L95">						hasHeader = &quot;ol&quot;;</span>
+<span class="fc" id="L96">						fin += &quot;&lt;ol&gt;\n&lt;li&gt;&quot;;</span>
+<span class="fc" id="L97">						return sentence.substring(sentence.indexOf(&quot;. &quot;) + 2);</span>
+					}
+<span class="nc" id="L99">					catch(Exception e){</span>
+
+<span class="nc" id="L101">					}</span>
+				}
+			}
+<span class="fc bfc" id="L104" title="All 2 branches covered.">			else if(token.equals(&quot;bq&quot;)){</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">				if(isBlockQuote){</span>
+<span class="fc" id="L106">					return sentence.substring(1);</span>
+				}
+				else{
+<span class="fc" id="L109">					hasHeader = &quot;bq&quot;;</span>
+<span class="fc" id="L110">					isBlockQuote = true;</span>
+<span class="fc" id="L111">					fin += &quot;&lt;blockquote&gt;\n&quot;;</span>
+<span class="fc" id="L112">					return sentence.substring(1);</span>
+				}
+			}
+			else{
+<span class="fc" id="L116">				return sentence;</span>
+			}
+		}
+		// Just write down the sentence
+		else {
+<span class="fc" id="L121">			fin += sentence;	</span>
+		}
+<span class="fc" id="L123">		return &quot;&quot;;</span>
+	}
+
+	void writeFin(){
+		try{
+<span class="fc" id="L128">			out.write(fin);</span>
+		}
+<span class="nc" id="L130">		catch(Exception e){</span>
+
+<span class="fc" id="L132">		}</span>
+<span class="fc" id="L133">		fin = &quot;&quot;;</span>
+<span class="fc" id="L134">	}</span>
+
+	boolean isHorizontalRule(String s){
+<span class="fc" id="L137">		String s2 = s.trim();</span>
+<span class="fc" id="L138">		int n1 = count(s2, '*');</span>
+<span class="fc" id="L139">		int n2 = count(s2, ' ');</span>
+<span class="fc" id="L140">		int n3 = count(s2, '_');</span>
+<span class="fc bfc" id="L141" title="All 4 branches covered.">		if(n1 + n2 == s2.length() &amp;&amp; n1 &gt;= 3){</span>
+<span class="fc" id="L142">			fin += &quot;&lt;hr&gt;\n&quot;;</span>
+<span class="fc" id="L143">			return true;</span>
+		}
+<span class="fc bfc" id="L145" title="All 4 branches covered.">		else if(n2 + n3 == s2.length() &amp;&amp; n3 &gt;= 3){</span>
+<span class="fc" id="L146">			fin += &quot;&lt;hr&gt;\n&quot;;</span>
+<span class="fc" id="L147">			return true;</span>
+		}
+		else	
+<span class="fc" id="L150">			return false;</span>
+	}
+
+	int count(String s, char c){
+<span class="fc" id="L154">		int n = 0, i = 0;</span>
+<span class="fc" id="L155">		char [] carr = s.toCharArray();</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">		for(i = 0; i &lt; s.length(); i++){</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">			if(carr[i] == c)</span>
+<span class="fc" id="L158">				n++;</span>
+		}
+<span class="fc" id="L160">		return n;</span>
+	}
+
+	void decide(){
+<span class="fc bfc" id="L164" title="All 2 branches covered.">		if(isOrderList){</span>
+<span class="fc" id="L165">			endOfOrderList();</span>
+<span class="fc" id="L166">			isOrderList = false;</span>
+		}
+<span class="fc bfc" id="L168" title="All 2 branches covered.">		if(isBlockQuote){</span>
+<span class="fc" id="L169">			endOfBlockQuote();</span>
+<span class="fc" id="L170">			isBlockQuote = false;</span>
+		}
+<span class="fc" id="L172">	}</span>
+
+	void endOfLine(){
+<span class="fc bfc" id="L175" title="All 2 branches covered.">		if(hasHeader.startsWith(&quot;h&quot;))</span>
+<span class="fc" id="L176">				fin += (&quot;&lt;/&quot; + hasHeader + &quot;&gt;\n&quot;);</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">		else if(hasHeader.equals(&quot;ul&quot;))</span>
+<span class="fc" id="L178">				fin += &quot;&lt;/li&gt;&lt;/ul&gt;\n&quot;;</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">		else if(hasHeader.equals(&quot;ol&quot;))</span>
+<span class="fc" id="L180">				fin += &quot;&lt;/li&gt;\n&quot;;</span>
+<span class="fc" id="L181">	}</span>
+
+	void endOfOrderList(){
+		try{
+<span class="fc" id="L185">			fin += &quot;&lt;/ol&gt;\n&quot;;</span>
+		}
+<span class="nc" id="L187">		catch(Exception e){</span>
+				
+<span class="fc" id="L189">		}</span>
+<span class="fc" id="L190">	}</span>
+
+	int isItSetext(String s){
+<span class="fc" id="L193">		String s2 = s.trim();</span>
+<span class="fc" id="L194">		int n1 = count(s2, '=');</span>
+<span class="fc" id="L195">		int n2 = count(s2, ' ');</span>
+<span class="fc" id="L196">		int n3 = count(s2, '-');</span>
+<span class="fc" id="L197">		int maxn = Math.max(n1, Math.max(n2, n3));</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">		if(n2 &gt; 0){</span>
+<span class="fc" id="L199">			return 3;</span>
+		} 
+<span class="fc bfc" id="L201" title="All 6 branches covered.">		if(n1 == maxn &amp;&amp; n1 == s2.length() &amp;&amp; n1 != 0){</span>
+<span class="fc" id="L202">			return 1;</span>
+		}
+<span class="fc bfc" id="L204" title="All 4 branches covered.">		if(n3 == maxn &amp;&amp; n3 == s2.length()){</span>
+<span class="fc" id="L205">			return 2;</span>
+		}
+		
+<span class="fc" id="L208">		return 3;</span>
+	}
+
+	void setextHeader(int n){
+<span class="fc bfc" id="L212" title="All 2 branches covered.">		if(n == 1){</span>
+			try{
+<span class="fc" id="L214">				out.write(&quot;&lt;h1&gt;&quot;);</span>
+			}
+<span class="nc" id="L216">			catch(Exception e){</span>
+
+<span class="pc" id="L218">			}</span>
+		}
+<span class="fc bfc" id="L220" title="All 2 branches covered.">		else if(n == 2){</span>
+			try{
+<span class="fc" id="L222">				out.write(&quot;&lt;h2&gt;&quot;);</span>
+			}
+<span class="nc" id="L224">			catch(Exception e){</span>
+
+<span class="pc" id="L226">			}</span>
+		}
+		else{
+<span class="fc" id="L229">			return;</span>
+		}
+<span class="fc" id="L231">	}</span>
+
+	void closeSetextHeader(int n){
+<span class="fc bfc" id="L234" title="All 2 branches covered.">		if(n == 1){</span>
+			try{
+<span class="fc" id="L236">				out.write(&quot;&lt;/h1&gt;&quot;);</span>
+			}
+<span class="nc" id="L238">			catch(Exception e){</span>
+
+<span class="pc" id="L240">			}</span>
+		}
+<span class="fc bfc" id="L242" title="All 2 branches covered.">		else if(n == 2){</span>
+			try{
+<span class="fc" id="L244">				out.write(&quot;&lt;/h2&gt;&quot;);</span>
+			}
+<span class="nc" id="L246">			catch(Exception e){</span>
+
+<span class="pc" id="L248">			}</span>
+		}
+		else{
+<span class="fc" id="L251">			return;</span>
+		}
+<span class="fc" id="L253">	}</span>
+
+	void endOfBlockQuote(){
+<span class="fc" id="L256">		fin += &quot;&lt;/blockquote&gt;\n&quot;;</span>
+<span class="fc" id="L257">	}</span>
+
+	void newLineHtml(){
+<span class="fc" id="L260">		fin += &quot;&lt;br&gt;&quot;;	</span>
+<span class="fc" id="L261">	}</span>
+
+	String analyze(String s){
+<span class="fc" id="L264">		int n1 = s.indexOf(&quot;**&quot;);</span>
+<span class="fc bfc" id="L265" title="All 2 branches covered.">		if(n1 &lt; 0)</span>
+<span class="fc" id="L266">			n1 = 999999;</span>
+<span class="fc bfc" id="L267" title="All 4 branches covered.">		if(s.indexOf(&quot;/**&quot;) == n1 - 1 &amp;&amp; n1 != 0)</span>
+<span class="fc" id="L268">			n1 = 999999;</span>
+<span class="fc" id="L269">		int n2 = s.indexOf(&quot;*&quot;);</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">		if(n2 &lt; 0)</span>
+<span class="fc" id="L271">			n2 = 999999;</span>
+<span class="fc bfc" id="L272" title="All 4 branches covered.">		if(s.indexOf(&quot;/*&quot;) == n2 - 1 &amp;&amp; n2 != 0)</span>
+<span class="fc" id="L273">			n2 = 999999;</span>
+<span class="fc" id="L274">		int n3 = s.indexOf(&quot;__&quot;);</span>
+<span class="fc bfc" id="L275" title="All 2 branches covered.">		if(n3 &lt; 0)</span>
+<span class="fc" id="L276">			n3 = 999999;</span>
+<span class="fc bfc" id="L277" title="All 4 branches covered.">		if(s.indexOf(&quot;/__&quot;) == n3 - 1 &amp;&amp; n3 != 0)</span>
+<span class="fc" id="L278">			n3 = 999999;		</span>
+<span class="fc" id="L279">		int n4 = s.indexOf(&quot;_&quot;);</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">		if(n4 &lt; 0)</span>
+<span class="fc" id="L281">			n4 = 999999;</span>
+<span class="fc bfc" id="L282" title="All 4 branches covered.">		if(s.indexOf(&quot;/_&quot;) == n4 - 1 &amp;&amp; n4 != 0)</span>
+<span class="fc" id="L283">			n4 = 999999;</span>
+<span class="fc" id="L284">		int n5 = s.indexOf(&quot;~~&quot;);</span>
+<span class="fc bfc" id="L285" title="All 2 branches covered.">		if(n5 &lt; 0)</span>
+<span class="fc" id="L286">			n5 = 999999;</span>
+<span class="fc bfc" id="L287" title="All 4 branches covered.">		if(s.indexOf(&quot;/~~&quot;) == n5 - 1 &amp;&amp; n5 != 0)</span>
+<span class="fc" id="L288">			n5 = 999999;</span>
+<span class="fc" id="L289">		int n6 = s.indexOf(&quot;[&quot;);</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">		if(n6 &lt; 0)</span>
+<span class="fc" id="L291">			n6 = 999999;</span>
+<span class="fc" id="L292">		int n7 = s.indexOf(&quot;(&quot;);</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">		if(n7 &lt; 0)</span>
+<span class="fc" id="L294">			n7 = 999999;</span>
+<span class="fc" id="L295">		int n8 = s.indexOf(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L296" title="All 2 branches covered.">		if(n8 &lt; 0)</span>
+<span class="fc" id="L297">			n8 = 999999;</span>
+<span class="fc" id="L298">		int n9 = s.indexOf(&quot;&lt;&quot;);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">		if(n9 &lt; 0)</span>
+<span class="fc" id="L300">			n9 = 999999;</span>
+<span class="fc" id="L301">		int nMin = Math.min(n1, Math.min(n2, Math.min(n3, Math.min(n4, Math.min(n5, Math.min(n6, Math.min(n7, Math.min(n8, n9))))))));</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">		if(nMin == 999999)</span>
+<span class="fc" id="L303">			nMin = nMin+1;</span>
+		// Bold
+<span class="fc bfc" id="L305" title="All 2 branches covered.">		if(nMin == n1){</span>
+<span class="fc" id="L306">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;**&quot;)));</span>
+<span class="fc" id="L307">			s = s.substring(s.indexOf(&quot;**&quot;) + 2);</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">			if(s.indexOf(&quot;**&quot;) != -1){</span>
+<span class="fc" id="L309">				fin += &quot;&lt;strong&gt;&quot;;</span>
+<span class="fc" id="L310">				fin += s.substring(0, s.indexOf(&quot;**&quot;));</span>
+<span class="fc" id="L311">				fin += &quot;&lt;/strong&gt;&quot;;</span>
+<span class="fc" id="L312">				return s.substring(s.indexOf(&quot;**&quot;) + 2);</span>
+			}
+			else{
+<span class="fc" id="L315">				writeHtml(2, &quot;&quot;, &quot;**&quot;);</span>
+<span class="fc" id="L316">				return s;</span>
+			}
+		}
+		// Bold
+<span class="fc bfc" id="L320" title="All 2 branches covered.">		else if(nMin == n3){</span>
+<span class="fc" id="L321">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;__&quot;)));</span>
+<span class="fc" id="L322">			s = s.substring(s.indexOf(&quot;__&quot;) + 2);</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">			if(s.indexOf(&quot;__&quot;) != -1){</span>
+<span class="fc" id="L324">				fin += &quot;&lt;strong&gt;&quot;;</span>
+<span class="fc" id="L325">				fin += s.substring(0, s.indexOf(&quot;__&quot;));</span>
+<span class="fc" id="L326">				fin += &quot;&lt;/strong&gt;&quot;;</span>
+<span class="fc" id="L327">				return s.substring(s.indexOf(&quot;__&quot;) + 2);</span>
+			}
+			else{
+<span class="fc" id="L330">				writeHtml(2, &quot;&quot;, &quot;__&quot;);</span>
+<span class="fc" id="L331">				return s;</span>
+			}
+		}
+		// Emphasize
+<span class="fc bfc" id="L335" title="All 2 branches covered.">		else if(nMin == n2){</span>
+<span class="fc" id="L336">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;*&quot;)));</span>
+<span class="fc" id="L337">			s = s.substring(s.indexOf(&quot;*&quot;) + 1);</span>
+<span class="fc bfc" id="L338" title="All 2 branches covered.">			if(s.indexOf(&quot;*&quot;) != -1){</span>
+<span class="fc" id="L339">				fin += &quot;&lt;em&gt;&quot;;</span>
+<span class="fc" id="L340">				fin += s.substring(0, s.indexOf(&quot;*&quot;));</span>
+<span class="fc" id="L341">				fin += &quot;&lt;/em&gt;&quot;;</span>
+<span class="fc" id="L342">				return s.substring(s.indexOf(&quot;*&quot;) + 1);</span>
+			}
+			else{
+<span class="fc" id="L345">				writeHtml(2, &quot;&quot;, &quot;*&quot;);</span>
+<span class="fc" id="L346">				return s;</span>
+			}
+		}
+		// Emphasize
+<span class="fc bfc" id="L350" title="All 2 branches covered.">		else if(nMin == n4){</span>
+<span class="fc" id="L351">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;_&quot;)));</span>
+<span class="fc" id="L352">			s = s.substring(s.indexOf(&quot;_&quot;) + 1);</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">			if(s.indexOf(&quot;_&quot;) != -1){</span>
+<span class="fc" id="L354">				fin += &quot;&lt;em&gt;&quot;;</span>
+<span class="fc" id="L355">				fin += s.substring(0, s.indexOf(&quot;_&quot;));</span>
+<span class="fc" id="L356">				fin += &quot;&lt;/em&gt;&quot;;</span>
+<span class="fc" id="L357">				return s.substring(s.indexOf(&quot;_&quot;) + 1);</span>
+			}
+			else{
+<span class="fc" id="L360">				writeHtml(2, &quot;&quot;, &quot;_&quot;);</span>
+<span class="fc" id="L361">				return s;</span>
+			}
+		}
+		// Strikethrough
+<span class="fc bfc" id="L365" title="All 2 branches covered.">		else if(nMin == n5){</span>
+<span class="fc" id="L366">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;~~&quot;)));</span>
+<span class="fc" id="L367">			s = s.substring(s.indexOf(&quot;~~&quot;) + 2);</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">			if(s.indexOf(&quot;~~&quot;) != -1){</span>
+<span class="fc" id="L369">				fin += &quot;&lt;strike&gt;&quot;;</span>
+<span class="fc" id="L370">				fin += s.substring(0, s.indexOf(&quot;~~&quot;));</span>
+<span class="fc" id="L371">				fin += &quot;&lt;/strike&gt;&quot;;</span>
+<span class="fc" id="L372">				return s.substring(s.indexOf(&quot;~~&quot;) + 2);</span>
+			}
+			else{
+<span class="fc" id="L375">				writeHtml(2, &quot;&quot;, &quot;~~&quot;);</span>
+<span class="fc" id="L376">				return s;</span>
+			}
+		}
+		// link with inline style
+<span class="fc bfc" id="L380" title="All 2 branches covered.">		else if(nMin == n6){</span>
+<span class="fc" id="L381">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;[&quot;)));</span>
+<span class="fc" id="L382">			s = s.substring(s.indexOf(&quot;[&quot;) + 1);</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">			if(s.indexOf(&quot;](&quot;) != -1){</span>
+<span class="fc bfc" id="L384" title="All 2 branches covered.">				if(s.indexOf(&quot;)&quot;) != -1){</span>
+<span class="fc" id="L385">					String txt = s.substring(0, s.indexOf(&quot;](&quot;));</span>
+<span class="fc" id="L386">					s = s.substring(s.indexOf(&quot;](&quot;) + 2);</span>
+<span class="fc" id="L387">					String link = s.substring(0, s.indexOf(&quot;)&quot;));</span>
+<span class="fc" id="L388">					fin += &quot;&lt;a href=&quot;;</span>
+<span class="fc" id="L389">					fin += (&quot;\&quot;&quot; + link + &quot;\&quot;&quot;);</span>
+<span class="fc" id="L390">					fin += (&quot;&gt;&quot; + txt + &quot;&lt;/a&gt;&quot;);</span>
+<span class="fc" id="L391">					return s.substring(s.indexOf(&quot;)&quot;) + 1);</span>
+				}
+				else{
+<span class="fc" id="L394">					writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;])&quot;) + 2));</span>
+<span class="fc" id="L395">					return s.substring(s.indexOf(&quot;](&quot;) + 2);</span>
+				}
+			}
+			else{
+<span class="fc" id="L399">				return s;</span>
+			}
+		}
+		// link w/o inline style
+<span class="fc bfc" id="L403" title="All 2 branches covered.">		else if(nMin == n7){</span>
+
+		}
+		// ampersand
+<span class="fc bfc" id="L407" title="All 2 branches covered.">		else if(nMin == n8){</span>
+<span class="fc" id="L408">			writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;&amp;&quot;)) + &quot;&amp;amp;&quot;);</span>
+<span class="fc" id="L409">			return s.substring(s.indexOf(&quot;&amp;&quot;) + 1);</span>
+		}
+		// &lt;
+<span class="fc bfc" id="L412" title="All 2 branches covered.">		else if(nMin == n9){</span>
+<span class="fc bfc" id="L413" title="All 2 branches covered.">			if(s.indexOf(&quot;&gt;&quot;) == -1){</span>
+<span class="fc" id="L414">				writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;&lt;&quot;)) + &quot;&amp;lt;&quot;);</span>
+<span class="fc" id="L415">				return s.substring(s.indexOf(&quot;&lt;&quot;) + 1);</span>
+			}
+			else{
+<span class="fc" id="L418">				writeHtml(2, &quot;&quot;, s.substring(0, s.indexOf(&quot;&lt;&quot;)));</span>
+<span class="fc" id="L419">				return s.substring(s.indexOf(&quot;&lt;&quot;) + 1);</span>
+			}
+		}
+		else{
+<span class="fc" id="L423">			writeHtml(2, &quot;&quot;, s);</span>
+<span class="fc" id="L424">			newLineHtml();</span>
+		}
+<span class="fc" id="L426">		return &quot;&quot;;</span>
+	}
+
+	void closeHtml(){
+<span class="fc bfc" id="L430" title="All 2 branches covered.">		if(isOrderList){</span>
+<span class="fc" id="L431">			endOfOrderList();</span>
+<span class="fc" id="L432">			isOrderList = false;</span>
+		}
+<span class="fc bfc" id="L434" title="All 2 branches covered.">		if(isBlockQuote){</span>
+<span class="fc" id="L435">			endOfBlockQuote();</span>
+<span class="fc" id="L436">			isBlockQuote = false;</span>
+		}
+<span class="fc" id="L438">		writeFin();</span>
+        try{
+<span class="fc" id="L440">            String s = &quot;\n&lt;/p&gt;\n&lt;/body&gt;&lt;/html&gt;&quot;;</span>
+<span class="fc" id="L441">            out.write(s);</span>
+<span class="fc" id="L442">            fin += s;</span>
+<span class="fc" id="L443">            out.close();</span>
+        }
+<span class="nc" id="L445">         catch(Exception e){</span>
+<span class="nc" id="L446">            System.out.println(&quot;HTML CLOSE ERROR&quot;);</span>
+<span class="fc" id="L447">        }</span>
+<span class="fc" id="L448">    }</span>
+
+    void paragraph(){
+
+<span class="fc" id="L452">        fin += &quot;&lt;/p&gt;&lt;p&gt;&quot;;</span>
+<span class="fc" id="L453">    }</span>
+
+	public void accept(Visitor visitor){
+<span class="nc" id="L456">		visitor.visit(this);</span>
+<span class="nc" id="L457">	}</span>
+}
+
+<span class="fc" id="L460">class tokenizer implements Visitable{</span>
+	// Condition : There is a possibility of table
+	String whatToken(String s){
+<span class="fc bfc" id="L463" title="All 2 branches covered.">		if(s.startsWith(&quot;\r&quot;))</span>
+<span class="fc" id="L464">			return &quot;pg&quot;;</span>
+<span class="fc" id="L465">		String tok = startsWtoken(s);</span>
+<span class="fc bfc" id="L466" title="All 2 branches covered.">		if(tok.equals(&quot;&quot;))</span>
+<span class="fc" id="L467">			return &quot;&quot;;</span>
+		else
+<span class="fc" id="L469">			return tok;</span>
+	}
+
+	String startsWtoken(String s){
+<span class="fc" id="L473">		s = s.trim();</span>
+		try{
+<span class="fc" id="L475">			int n = Integer.parseInt(s.substring(0, s.indexOf(&quot;. &quot;)));</span>
+<span class="fc" id="L476">			return &quot;ol&quot;;</span>
+		}
+<span class="fc" id="L478">		catch(Exception e){</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">			if(s.startsWith(&quot;###### &quot;))</span>
+<span class="fc" id="L480">				return &quot;h6&quot;;</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">			else if(s.startsWith(&quot;##### &quot;))</span>
+<span class="fc" id="L482">				return &quot;h5&quot;;</span>
+<span class="fc bfc" id="L483" title="All 2 branches covered.">			else if(s.startsWith(&quot;#### &quot;))</span>
+<span class="fc" id="L484">				return &quot;h4&quot;;</span>
+<span class="fc bfc" id="L485" title="All 2 branches covered.">			else if(s.startsWith(&quot;### &quot;))</span>
+<span class="fc" id="L486">				return &quot;h3&quot;;</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">			else if(s.startsWith(&quot;## &quot;))</span>
+<span class="fc" id="L488">				return &quot;h2&quot;;</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">			else if(s.startsWith(&quot;# &quot;))</span>
+<span class="fc" id="L490">				return &quot;h1&quot;;</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">			else if(s.startsWith(&quot;* &quot;))</span>
+<span class="fc" id="L492">				return &quot;ul&quot;;</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">			else if(s.startsWith(&quot;+ &quot;))</span>
+<span class="fc" id="L494">				return &quot;ul&quot;;</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">			else if(s.startsWith(&quot;- &quot;))</span>
+<span class="fc" id="L496">				return &quot;ul&quot;;</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">			else if(s.startsWith(&quot;&gt;&quot;))</span>
+<span class="fc" id="L498">				return &quot;bq&quot;;</span>
+			else
+<span class="fc" id="L500">				return &quot;&quot;;</span>
+		}
+	}
+
+	public void accept(Visitor visitor){
+<span class="nc" id="L505">		visitor.visit(this);</span>
+<span class="nc" id="L506">	}</span>
+}
+
+<span class="fc" id="L509">class parser implements Visitable{</span>
+<span class="fc" id="L510">	String s = &quot;&quot;;</span>
+<span class="fc" id="L511">	int c = 0;</span>
+<span class="fc" id="L512">	boolean endOfFile = false;</span>
+
+	boolean isItEnd(){
+<span class="fc" id="L515">		return endOfFile;</span>
+	}
+
+	String parse(FileInputStream f){
+		try{
+			while(true){
+<span class="fc" id="L521">				c = f.read();</span>
+				// END CONDITION
+<span class="fc bfc" id="L523" title="All 2 branches covered.">				if(c == -1){</span>
+<span class="fc" id="L524">					String rets = s;</span>
+<span class="fc" id="L525">					endOfFile = true;</span>
+<span class="fc" id="L526">					return rets;</span>
+				}
+				// EOF
+<span class="fc bfc" id="L529" title="All 2 branches covered.">				else if((char)c == '\n'){</span>
+<span class="fc" id="L530">					String rets = s;</span>
+<span class="fc" id="L531">					s = &quot;&quot;;</span>
+<span class="fc" id="L532">					return rets;</span>
+				}
+<span class="fc" id="L534">				s += (char)c;</span>
+			}
+		}
+<span class="nc" id="L537">		catch(Exception e){</span>
+<span class="nc" id="L538">			return &quot;&quot;;	</span>
+		}
+	}
+
+	public void accept(Visitor visitor){
+<span class="nc" id="L543">		visitor.visit(this);</span>
+<span class="nc" id="L544">	}</span>
+}
+
+<span class="fc" id="L547">class getCmd implements Visitable{</span>
+	String option;
+	String arguments[];
+
+	void getargs(String args[]){
+<span class="fc" id="L552">		arguments = args;</span>
+<span class="fc" id="L553">	}</span>
+
+	void help(){
+<span class="fc" id="L556">        System.out.println(&quot;-----------HELP-------------&quot;);</span>
+<span class="fc" id="L557">        System.out.println(&quot;MarkDown -&gt; HTML Converter&quot;);</span>
+<span class="fc" id="L558">        System.out.println(&quot;v. 1. 0.&quot;);</span>
+<span class="fc" id="L559">        System.out.println(&quot;Valid Options&quot;);</span>
+<span class="fc" id="L560">        System.out.println(&quot;1. plain   2. fancy   3. slide&quot;);</span>
+<span class="fc" id="L561">        System.out.println(&quot;argument 1 = File name&quot;);</span>
+<span class="fc" id="L562">        System.out.println(&quot;argument 2 = Option   &quot;);</span>
+<span class="fc" id="L563">        System.out.println(&quot;________________________________&quot;);</span>
+<span class="fc" id="L564">    }   </span>
+
+    String getOption(){
+<span class="fc" id="L567">    	return option;</span>
+    }
+
+    boolean checkIfValid(String arguments[]){
+    // Check if given file is a valid md file
+<span class="fc" id="L572">        int locationOfDot = 0;</span>
+<span class="fc" id="L573">        String checkValidMD = null;</span>
+
+<span class="fc bfc" id="L575" title="All 4 branches covered.">        if(arguments.length &gt; 2 || arguments.length == 0){</span>
+<span class="fc" id="L576">            System.out.println(&quot;ERROR : Invalid command line arguments!&quot;);</span>
+<span class="fc" id="L577">            return false;</span>
+        }
+
+<span class="fc bfc" id="L580" title="All 2 branches covered.">        if(arguments[0].equals(&quot;HELP&quot;)){</span>
+<span class="fc" id="L581">        	help();</span>
+<span class="fc" id="L582">        	return false;</span>
+        }
+
+<span class="fc" id="L585">        locationOfDot = arguments[0].indexOf('.');</span>
+        
+<span class="fc bfc" id="L587" title="All 2 branches covered.">        if(locationOfDot == -1){</span>
+<span class="fc" id="L588">            System.out.println(&quot;ERROR : Invalid fle name!&quot;);</span>
+<span class="fc" id="L589">            return false;</span>
+        }
+        
+<span class="fc" id="L592">        checkValidMD = arguments[0].substring(locationOfDot);    </span>
+        
+<span class="fc bfc" id="L594" title="All 2 branches covered.">        if(!checkValidMD.equals(&quot;.md&quot;)){</span>
+<span class="fc" id="L595">            System.out.println(&quot;ERROR: Invalid fle name!&quot;);</span>
+<span class="fc" id="L596">            return false;</span>
+        }
+
+<span class="fc bfc" id="L599" title="All 2 branches covered.">        if(arguments.length &gt; 1){</span>
+<span class="fc bfc" id="L600" title="All 2 branches covered.">         	if(arguments[1].equals(&quot;plain&quot;)){</span>
+<span class="fc" id="L601">         		option = &quot;plain&quot;;</span>
+<span class="fc" id="L602">         		return true;</span>
+         	} 
+
+<span class="fc bfc" id="L605" title="All 2 branches covered.">         	if(arguments[1].equals(&quot;fancy&quot;)){</span>
+<span class="fc" id="L606">         		option = &quot;fancy&quot;;</span>
+<span class="fc" id="L607">         		return true;</span>
+         	}
+
+<span class="fc bfc" id="L610" title="All 2 branches covered.">         	if(arguments[1].equals(&quot;slide&quot;)){</span>
+<span class="fc" id="L611">         		option = &quot;slide&quot;;</span>
+<span class="fc" id="L612">         		return true;</span>
+         	}
+	       		
+	     	else{
+<span class="fc" id="L616">	     		System.out.println(&quot;ERROR: Invalid Option!&quot;);</span>
+<span class="fc" id="L617">	     		return false;</span>
+	     	}
+		}
+	    else 
+<span class="fc" id="L621">           return true;</span>
+    }
+
+    FileInputStream readFile(String fileName){
+<span class="fc" id="L625">        FileInputStream f = null;</span>
+        try{
+<span class="fc" id="L627">            f = new FileInputStream(fileName);</span>
+        }
+<span class="fc" id="L629">        catch(Exception e){</span>
+<span class="fc" id="L630">            System.out.println(&quot;ERROR: File does not exist!&quot;);</span>
+<span class="fc" id="L631">        }</span>
+<span class="fc" id="L632">        return f;</span>
+    }
+
+	public void accept(Visitor visitor){
+<span class="nc" id="L636">		visitor.visit(this);</span>
+<span class="nc" id="L637">	}	</span>
+}
+
+class initialize implements Visitor{
+	String args[];
+	String option;
+	FileInputStream file;
+
+<span class="fc" id="L645">	initialize(String arguments[]){</span>
+<span class="fc" id="L646">		args = arguments;</span>
+<span class="fc" id="L647">	}</span>
+
+	public FileInputStream visit(getCmd getcmd){
+<span class="fc" id="L650">		getcmd.getargs(args);</span>
+<span class="fc bfc" id="L651" title="All 2 branches covered.">		if(!getcmd.checkIfValid(args))</span>
+<span class="nc" id="L652">			System.exit(1);</span>
+<span class="fc" id="L653">		file = getcmd.readFile(args[0]);</span>
+<span class="fc" id="L654">		option = getcmd.getOption();</span>
+<span class="fc bfc" id="L655" title="All 2 branches covered.">		if(file == null)</span>
+<span class="nc" id="L656">			System.exit(1);</span>
+<span class="fc" id="L657">		return file;</span>
+	}
+
+	public String visit(tokenizer tok){
+<span class="fc" id="L661">		return &quot;&quot;;</span>
+	}
+
+	public void visit(htmlHandler handler){
+<span class="fc" id="L665">		handler.init(&quot;output.html&quot;);</span>
+<span class="fc" id="L666">		return;</span>
+	}
+
+	public String visit(parser parse){
+<span class="fc" id="L670">		return &quot;&quot;;</span>
+	}
+}
+
+class mainProgram implements Visitor{
+	FileInputStream mdFile;
+	String line;
+	String token;
+<span class="fc" id="L678">	mainProgram(FileInputStream f){</span>
+<span class="fc" id="L679">		mdFile = f;</span>
+<span class="fc" id="L680">	}</span>
+
+	public FileInputStream visit(getCmd getcmd){
+<span class="fc" id="L683">		return null;</span>
+	}
+
+	public String visit(tokenizer tok){
+<span class="fc" id="L687">		token = tok.whatToken(line);</span>
+<span class="fc" id="L688">		return token;</span>
+	}
+
+	public void visit(htmlHandler handler){
+<span class="fc" id="L692">		int num = handler.isItSetext(line);</span>
+<span class="fc bfc" id="L693" title="All 2 branches covered.">		if(num != 3)</span>
+<span class="fc" id="L694">			line = &quot;&quot;;</span>
+<span class="fc" id="L695">		handler.setextHeader(num);</span>
+<span class="fc" id="L696">		handler.writeFin();</span>
+<span class="fc" id="L697">		handler.closeSetextHeader(num);</span>
+<span class="fc bfc" id="L698" title="All 2 branches covered.">		if(handler.isHorizontalRule(line))</span>
+<span class="fc" id="L699">			return;</span>
+		// Starting condition checker
+<span class="fc bfc" id="L701" title="All 8 branches covered.">		if(token.startsWith(&quot;h&quot;) || token.equals(&quot;ul&quot;) || token.equals(&quot;ol&quot;) || token.equals(&quot;bq&quot;)){</span>
+<span class="fc" id="L702">			line = handler.writeHtml(1, token, line);</span>
+		}
+		else{
+<span class="fc" id="L705">			handler.decide();</span>
+<span class="fc" id="L706">			handler.hasHeader = &quot;&quot;;</span>
+		}
+<span class="fc bfc" id="L708" title="All 2 branches covered.">		if(token.equals(&quot;pg&quot;)){</span>
+<span class="fc" id="L709">			handler.paragraph();</span>
+		}
+		// Check through the line
+		while(true){
+<span class="fc" id="L713">			line = handler.analyze(line);</span>
+<span class="fc bfc" id="L714" title="All 2 branches covered.">			if(line.equals(&quot;&quot;))</span>
+<span class="fc" id="L715">				break;</span>
+		}
+<span class="fc" id="L717">		handler.endOfLine();</span>
+<span class="fc bfc" id="L718" title="All 2 branches covered.">		if(token.equals(&quot;&quot;)){</span>
+<span class="fc" id="L719">			line = handler.writeHtml(1, token, line);</span>
+<span class="fc" id="L720">			handler.writeHtml(2, &quot;&quot;, line);</span>
+		}
+<span class="fc" id="L722">		return;</span>
+	}
+
+	public String visit(parser parse){
+<span class="fc" id="L726">		String s = &quot;&quot;;</span>
+<span class="fc bfc" id="L727" title="All 2 branches covered.">		if(!parse.isItEnd())</span>
+<span class="fc" id="L728">			s = parse.parse(mdFile);</span>
+<span class="fc" id="L729">		line = s;</span>
+<span class="fc" id="L730">		return s;</span>
+	}
+}
+
+<span class="fc" id="L734">class finish implements Visitor{</span>
+	public FileInputStream visit(getCmd getcmd){
+<span class="fc" id="L736">		return null;</span>
+	}
+
+	public String visit(tokenizer tok){
+<span class="fc" id="L740">		return &quot;&quot;;</span>
+	}
+
+	public void visit(htmlHandler handler){
+<span class="fc" id="L744">		handler.closeHtml();</span>
+<span class="fc" id="L745">		return;</span>
+	}
+
+	public String visit(parser parse){
+<span class="fc" id="L749">		return &quot;&quot;;</span>
+	}
+}
+
+<span class="nc" id="L753">public class vp {</span>
+   public static void main(String[] args) {
+   		FileInputStream mdFile;
+<span class="fc" id="L756">   		initialize init = new initialize(args);</span>
+<span class="fc" id="L757">   		mdFile = init.visit(new getCmd());</span>
+<span class="fc" id="L758">   		htmlHandler html = new htmlHandler();</span>
+   		// INITIATE
+<span class="fc" id="L760">   		init.visit(html);</span>
+<span class="fc" id="L761">   		init.visit(new tokenizer());</span>
+<span class="fc" id="L762">   		init.visit(new parser());</span>
+
+   		// PARSE
+<span class="fc" id="L765">   		mainProgram mainP = new mainProgram(mdFile);</span>
+<span class="fc" id="L766">   		mainP.visit(new getCmd());</span>
+<span class="fc" id="L767">   		parser p = new parser();</span>
+<span class="fc" id="L768">   		String s = &quot;INITIAL&quot;;</span>
+
+   		while(true){
+<span class="fc" id="L771">   			s = mainP.visit(p);</span>
+<span class="fc bfc" id="L772" title="All 2 branches covered.">   			if(s.equals(&quot;&quot;))</span>
+<span class="fc" id="L773">   				break;</span>
+<span class="fc" id="L774">   			mainP.visit(new tokenizer());</span>
+<span class="fc" id="L775">   			mainP.visit(html);</span>
+   		}
+
+   		// FINISH
+<span class="fc" id="L779">   		finish fin = new finish();</span>
+<span class="fc" id="L780">   		fin.visit(html);</span>
+<span class="fc" id="L781">   		fin.visit(new tokenizer());</span>
+<span class="fc" id="L782">   		fin.visit(new getCmd());</span>
+<span class="fc" id="L783">   		fin.visit(p);</span>
+<span class="fc" id="L784">		System.out.println(&quot;End of the program&quot;);</span>
+<span class="fc" id="L785">   }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
